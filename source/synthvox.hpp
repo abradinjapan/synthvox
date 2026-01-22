@@ -21,6 +21,9 @@ namespace synthvox {
             // game start
             std::cout << "Running new game!" << std::endl;
 
+            // force x11 over wayland
+            setenv("SDL_VIDEODRIVER", "x11", 1);
+
             // init SDL3
             if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS)) {
                 // setup error
