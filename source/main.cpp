@@ -1,8 +1,8 @@
-#include <iostream>
+#include "synthvox.hpp"
 
 int main() {
-    // greet player
-    std::cout << "Ready to synthisize some blocks?" << std::endl;
+    // run game
+    synthvox::run();
 
     return 0;
 }
