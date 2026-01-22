@@ -4,9 +4,13 @@
 // C++
 #include <stdint.h>
 #include <iostream>
+#include <vector>
 
-// graphics
+// external
+#include <GL/glew.h>
+#include <GL/gl.h>
 #include <SDL3/SDL.h>
+#include <SDL3/SDL_audio.h>
 
 /* Basics */
 namespace synthvox {
@@ -21,6 +25,27 @@ namespace synthvox {
     typedef int64_t s64;
     typedef float f32;
     typedef double f64;
+    typedef bool boolean;
+
+    // character defines
+    typedef synthvox::u8 character;
+
+    // error
+    class error {
+    public:
+        bool occured;
+        std::string json;
+
+        // constructors
+        error() {
+            occured = false;
+            json = "\"error\": {\n\t\"reason\": \"No problem was detected.\"\n}";
+        }
+        error(bool _occured, std::string _json) {
+            occured = _occured;
+            json = _json;
+        }
+    };
 
     // world data
     namespace world {
