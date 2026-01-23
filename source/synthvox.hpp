@@ -12,10 +12,54 @@ namespace synthvox {
         synthvox::graphics::window game_window;
         synthvox::boolean is_running;
 
+        // shaders
+        synthvox::graphics::shaders chunk_shaders;
+
+        // file loaders
+        synthvox::file_loader file_loader;
+
     public:
         // error
         synthvox::error error;
 
+        game() {
+            // game state
+            game_window = synthvox::graphics::window();
+            is_running = false;
+
+            // shaders
+            chunk_shaders = synthvox::graphics::shaders();
+
+            // file loaders
+            file_loader = synthvox::file_loader();
+
+            // error
+            error = synthvox::error();
+        }
+
+    private:
+        // compile shader program
+        synthvox::graphics::shaders compile_shaders(std::string vertex_shader_file_path, std::string fragment_shader_file_path) {
+            synthvox::graphics::shaders output;
+
+            // load files
+            std::string vertex = file_loader.load_text_file(vertex_shader_file_path);
+            if (file_loader.error.occured) {
+                error = file_loader.error;
+                return synthvox::graphics::shaders();
+            }
+            std::string fragment = file_loader.load_text_file(fragment_shader_file_path);
+            if (file_loader.error.occured) {
+                error = file_loader.error;
+                return synthvox::graphics::shaders();
+            }
+
+            // compile shaders
+            output.open_shaders(&error, vertex, fragment);
+            return output;
+        }
+
+    public:
         // game loop
         void run() {
             // game start
@@ -41,6 +85,12 @@ namespace synthvox {
             // open game window
             game_window = synthvox::graphics::window();
             error = game_window.open(synthvox::graphics::window_styling("Synthvox", 800, 600));
+            if (error.occured) {
+                return;
+            }
+
+            // open shaders
+            chunk_shaders = compile_shaders("./source/shaders/chunks/vertex.glsl", "./source/shaders/chunks/fragment.glsl");
             if (error.occured) {
                 return;
             }

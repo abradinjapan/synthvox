@@ -21,7 +21,7 @@ namespace synthvox::graphics {
         GLint opengl_log_length;
         GLenum opengl_error_code;
 
-        // constructor
+        // constructors
         shader() {
             shader_ID = 0;
             code = "";
@@ -29,14 +29,16 @@ namespace synthvox::graphics {
             opengl_log_length = 0;
             opengl_error_code = GL_NO_ERROR;
         }
-
         // open and compile shader
-        shader(std::string _code, synthvox::error* _error, GLenum _shader_type) {
+        void open_shader(std::string _code, synthvox::error* _error, GLenum _shader_type) {
             // create new shader
             shader_ID = glCreateShader(_shader_type);
 
+            // setup temp
+            GLchar* temp = (GLchar*)_code.c_str();
+
             // send source code to gpu
-            glShaderSource(shader_ID, 1, (const GLchar* const*)_code.c_str(), NULL);
+            glShaderSource(shader_ID, 1, (const GLchar* const*)&temp, NULL);
 
             // compiler the shader
             glCompileShader(shader_ID);
@@ -66,7 +68,7 @@ namespace synthvox::graphics {
         }
 
         // close shader
-        ~shader() {
+        void close_shader() {
             glDeleteShader(shader_ID);
         }
     };
@@ -85,15 +87,25 @@ namespace synthvox::graphics {
         GLenum opengl_error_code;
 
         // constructors
-        shaders(synthvox::error* _error, std::string _vertex_shader, std::string _fragment_shader) {
+        shaders() {
+            program_ID = 0;
+            vertex_shader = synthvox::graphics::shader();
+            fragment_shader = synthvox::graphics::shader();
+            opengl_log = "";
+            opengl_log_length = 0;
+            opengl_error_code = GL_NO_ERROR;
+        }
+
+        // open shaders
+        void open_shaders(synthvox::error* _error, std::string _vertex_shader, std::string _fragment_shader) {
             // compile vertex shader
-            vertex_shader = synthvox::graphics::shader(_vertex_shader, _error, GL_VERTEX_SHADER);
+            vertex_shader.open_shader(_vertex_shader, _error, GL_VERTEX_SHADER);
             if ((*_error).occured) {
                 return;
             }
 
             // compile fragment shader
-            fragment_shader = synthvox::graphics::shader(_fragment_shader, _error, GL_FRAGMENT_SHADER);
+            fragment_shader.open_shader(_fragment_shader, _error, GL_FRAGMENT_SHADER);
             if ((*_error).occured) {
                 return;
             }
@@ -132,10 +144,10 @@ namespace synthvox::graphics {
         }
 
         // close shaders
-        ~shaders() {
+        void close_shaders() {
             // close individual shaders
-            vertex_shader.~shader();
-            fragment_shader.~shader();
+            vertex_shader.close_shader();
+            fragment_shader.close_shader();
 
             // close shader program
             glDeleteProgram(program_ID);
